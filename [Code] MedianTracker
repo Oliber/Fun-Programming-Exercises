@@ -29,6 +29,10 @@ public class MedianTracker {
    public static class LinkedListImplementation {      
       private ListNode front;
       
+      public LinkedListImplementation() {
+         this.front = null;
+      }
+      
       public LinkedListImplementation(ListNode front) {
          this.front = front;
       }
@@ -83,16 +87,24 @@ public class MedianTracker {
          }else {
             return current.data + ", " + toString(current.next);
          }
-      }                        
+      }
+      
+      public boolean isEmpty() {
+         return this.front == null;
+      }                           
    }
                   
    public static void main(String[] args) {
-      ListNode first = new ListNode(50, null);
-      
+
       LinkedListImplementation tracker = 
-            new LinkedListImplementation(first);
+            new LinkedListImplementation();
             
       Scanner inputStream = new Scanner(System.in);
+      
+      if(tracker.isEmpty()) {
+         ListNode first = new ListNode(inputStream.nextInt(), null);
+         tracker.front = first;
+      }
       
       int index = 0;
       
