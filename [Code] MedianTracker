@@ -1,0 +1,114 @@
+I stumbled upon a challenge proposed on the DreamInCode forums and could nto resist to solve it.
+http://www.dreamincode.net/forums/topic/379330-challenge-keep-track-of-the-median-of-a-stream-of-integers/
+
+I used a LinkedList to sort the incoming digits. The main code is in the LinkedListImplementation's add method. I've noticed a pattern when investigating the three cases of adding in pairs of numbers : both smaller than front, both bigger than last and one bigger one smaller. I came to conclude that the index of the median increases by 1 every time I add a pair of numbers.
+
+i.e.
+[50] index 0
+[25, 50, 75] index 1
+[1, 5, 25, 50, 75] index 2
+[1, 5, 25, 50, 75, 100, 150] index 3
+...
+
+Code :
+
+import java.util.*;
+
+public class MedianTracker {
+
+   public static class ListNode {
+      private int data;
+      private ListNode next;
+      
+      public ListNode(int data, ListNode next) {
+         this.data = data;
+         this.next = next;
+      }
+   }
+   
+   public static class LinkedListImplementation {      
+      private ListNode front;
+      
+      public LinkedListImplementation(ListNode front) {
+         this.front = front;
+      }
+      
+      public void add(int num) {
+         ListNode current = this.front;
+         add(num, current, true);
+      }
+      
+      private ListNode add(int num, ListNode current, boolean isFirst) {
+         if(current == null) {
+            throw new IllegalArgumentException("List is Empty");
+         }      
+         if(num <= current.data) {
+            ListNode next = new ListNode(num, current);
+            if(isFirst) {
+               this.front = next;
+            }
+            return next;   
+         }else {
+            if(current.next == null) {
+               current.next = new ListNode(num, null);
+               return current;
+            }else {
+               current.next = add(num, current.next, false);
+               return current;
+            }
+         }    
+      } 
+      
+      public int getAtIndex(int index) {
+      ListNode current = this.front;
+         return getAtIndex(index, current);
+      }
+      
+      private int getAtIndex(int index, ListNode current) {
+         if(index == 0) {
+            return current.data;
+         }else {
+            current = current.next;
+            return getAtIndex(index - 1, current);
+         }
+      }
+      
+      public String toString() {
+         return "[" + toString(this.front);
+      }
+     
+      private String toString(ListNode current) {
+         if(current.next == null) {
+            return current.data + "]";
+         }else {
+            return current.data + ", " + toString(current.next);
+         }
+      }                        
+   }
+                  
+   public static void main(String[] args) {
+      ListNode first = new ListNode(50, null);
+      
+      LinkedListImplementation tracker = 
+            new LinkedListImplementation(first);
+            
+      Scanner inputStream = new Scanner(System.in);
+      
+      int index = 0;
+      
+      while(true) {
+         tracker.add(inputStream.nextInt());
+         tracker.add(inputStream.nextInt());
+         index++;
+         int med = tracker.getAtIndex(index);
+         System.out.println(tracker.toString());
+         System.out.println("Median " + med);
+      }   
+   }
+}   
+
+Resources :
+    Nested Classes, Oracle - https://docs.oracle.com/javase/tutorial/java/javaOO/nested.html
+        Still do not fully understand the difference of static and non-static inner classes and how to properly
+        define and create objects.
+    
