@@ -1,0 +1,103 @@
+/*
+ * Allen Tran
+ * CSE 143
+ * Traveling Salesperson Problem
+ * 
+ * This class finds all the possible routes given a
+ * file of distances and locations and prints them.
+ * 
+ */
+
+import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
+
+public class TSP {
+
+	private Map<String, Map<String, Double>> everyone;
+
+	/*
+	 * Constructs a new TSP from a passed list of distances
+	 * and locations.
+	 * Precondition :
+	 * List cannot be null
+	 */
+	public TSP(List<String> data) {
+		this.everyone = new HashMap<String, Map<String, Double>>();
+		this.createMap(data);
+	}
+
+	/*
+	 * Creates a travel map given a list of distances and locations
+	 * Precondition :
+	 * List cannot be null
+	 */
+	private void createMap(List<String> data) {
+		for(String line : data) {
+			// Split the information in each line
+			String[] info = line.split(",");
+			// First piece of information is the distance
+			double distance = Double.parseDouble(info[0]);
+			// Assigns key to value pairs to the map
+			// Account for symmetry of location A to B
+			// and location B to A
+			if(!this.everyone.containsKey(info[1])) {
+				this.everyone.put(info[1], new HashMap<String, Double>());
+			}
+			if(!this.everyone.containsKey(info[2])) {
+				this.everyone.put(info[2], new HashMap<String, Double>());
+			}   
+			this.everyone.get(info[1]).put(info[2], distance);
+			this.everyone.get(info[2]).put(info[1], distance);
+		}
+	}
+
+	/*
+	 * Prints all the possible routes given a String representing the
+	 * starting position from the travel map.
+	 * Precondition :
+	 * Start must be a valid location
+	 * otherwise throws an IllegalArgumentException
+	 */
+	public void print(String start) {
+		if(!everyone.containsKey(start)) {
+			throw new IllegalArgumentException();
+		}   
+		List<String> acc = new ArrayList<String>();
+		acc.add(start);
+		this.print(start, acc, 0.0);
+	}
+
+	/*
+	 * Prints all the possible routes given a String representing the
+	 * starting position from the travel map. List acc keeps track of 
+	 * the path taken and sum keeps track of the distance traveled.
+	 * Precondition :
+	 * Start must be a valid location
+	 * otherwise throws an IllegalArgumentException
+	 */
+	private void print(String start, List<String> acc, double sum) {
+		if(acc.size() == 1 + this.everyone.size()) {
+			// Then finished a round trip
+			System.out.println(acc + " (" + sum + " mi)");
+		}else if (acc.size() < this.everyone.size()) {
+			// Look into all the possible routes with last location visited
+			for(String next : everyone.get(start).keySet()) {
+				// Check for next possible location 
+				if(!acc.contains(next)) {
+					// Try it out
+					acc.add(next);
+					print(next, acc, sum + everyone.get(start).get(next));
+					acc.remove(acc.size() - 1);  
+				}
+			}
+		}else {
+			String first = acc.get(0);
+			acc.add(first);
+			print(first, acc, sum + this.everyone.get(acc.get(acc.size() - 2)).get(first));
+			// go back two
+			acc.remove(acc.size() - 1);
+		}
+	}
+}               
